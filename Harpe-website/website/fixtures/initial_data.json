@@ -1,0 +1,30 @@
+[
+  {
+    "model": "website.AAType",
+    "pk": 1,
+    "fields": {
+      "name": "TODO"
+    }
+  },
+  {
+    "model": "website.AAType",
+    "pk": 2,
+    "fields": {
+      "name": "default"
+    }
+  },
+  {
+    "model": "website.ModType",
+    "pk": 1,
+    "fields": {
+      "name": "TODO"
+    }
+  },
+  {
+    "model": "website.ModType",
+    "pk": 2,
+    "fields": {
+      "name": "default"
+    }
+  }
+]

@@ -1,0 +1,175 @@
+@import "css3.scss";
+
+
+#viewer {
+    width: 100%;
+
+    margin:0 auto;
+
+    .tool-box {
+        @extend .clearfix;
+        background-color: #A7CCC5; 
+
+        width : 100%;
+        min-height : 60px;
+        height : auto;
+
+        padding-bottom : 10px;
+        margin-bottom : 10px;
+
+        font-size : 0.9em;
+
+        .meta {
+            float:left;
+            width : auto;
+            padding : 5px;
+
+
+            table {
+                th {
+                    color : #006162;
+                }
+                td {
+                    color : #000;
+                }
+
+                td, th {
+                    border: 1px solid black;
+                    text-align:center;
+                    padding : 2px;
+                }
+                thead {
+                }
+                tbody {
+                }
+            }
+
+        }
+
+        .btns {
+            float : right;
+            margin : 5px;
+            margin-top : 15px;
+
+            #centroid {
+                padding: 5px 14px; 
+                margin: 10px 5px; 
+                font-weight: bold;  
+                color: #222; 
+                background: #c84b4b; 
+                border: 1px solid #dedede; 
+                font-family: Tahoma, Geneva, sans-serif;
+                font-size: 13px;
+                width : 100px;
+
+                &.checked {
+                    background: #68c864; 
+                }
+
+            }
+            .btn { 
+                padding: 5px 14px; 
+                margin: 10px 5px; 
+                font-weight: bold;  
+                color: #222; 
+                background: #fcfcfc; 
+                border: 1px solid #dedede; 
+                font-family: Tahoma, Geneva, sans-serif;
+                font-size: 13px;
+                width : 100px;
+
+                &:hover { 
+                    background: #ccc; 
+                    border: 1px solid #fff;
+                    color: #fff;  
+                }
+            }
+        }
+    }
+
+    .wrapper {
+        @extend .clearfix;
+
+        width : 100%;
+        height : 600px;
+
+        .msms_list {
+            width : 20%;
+            height : 100%;
+            float : right;
+            overflow:auto;
+
+
+            ul {
+                font-size : 0.6em;
+                list-style-type: none;
+                li {
+                    padding : 2px;
+                    cursor: pointer;
+
+                    &.odd {
+                        background-color: #A7CCC5; 
+                    }
+                    &.even {
+                        background-color: #d1fff7; 
+                    }
+
+                    &.selected {
+                        background-color: #FF8000;
+                    }
+                }
+            }
+        }
+
+        .sequence {
+            position : absolute;
+            top : 0;
+            left : 0;
+
+            .peak {
+                position: absolute;
+                display: block;
+                background-color: #4ac42d;
+                width : 1px;
+                height : 0px;
+            }
+
+            .aa {
+                margin-top : 10px;
+                //text-align:center;
+                position: absolute;
+                display: block;
+                width : 20%;
+            }
+        }
+
+        .viewer_msms {
+            width : 80%;
+            height : 100%;
+            float : left;
+        }
+    }
+
+
+    .viewer_overview {
+        width : 100%;
+        height : 150px;
+        padding-top : 20px;
+    }
+
+    .viewer_current_peak {
+        position: absolute;
+        display: block;
+        background-color: #20b600;
+        width : 1px;
+        height : 0px;
+    }
+
+    .viewer_indicator {
+        position: absolute;
+        display: block;
+        background-color: #ffbf00;
+        width : 1px;
+        height : 0px;
+    }
+}

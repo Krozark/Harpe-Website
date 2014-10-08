@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% load i18n markup  website_tags %}
+{% block page.title %}{{page}}  {{ object}}{% endblock %}
+
+{% block page.body %}
+<h2>{{ object.name }}</h2>
+
+<div class="post">
+    <div class="entry">
+        <table>
+            <tr>
+                <td>{% trans "Ion" %}</td>
+                <td><a href="{{object.analyse.get_absolute_url}}">{{object.analyse}}</a></td>
+            </tr>
+                <td>{% trans "score max" %}</td>
+                <td>{{object.score_max}}</td>
+            </tr>
+            <tr>
+                <td>{% trans "score min" %}</td>
+                <td>{{object.score_min}}</td>
+            </tr>
+            <tr>
+                <td>{% trans "m/z" %}</td>
+                <td>{{object.mz}}</td>
+            </tr>
+            <tr>
+                <td>{% trans "charge" %}</td>
+                <td>{{object.charge}}</td>
+            </tr>
+            <tr>
+                <td>{% trans "Mass" %}</td>
+                <td>{{object.mass}}</a></td>
+            <tr>
+            <tr>
+                <td>{% trans "intensitée" %}</td>
+                <td>{{object.intensity}}</td>
+            </tr>
+            <tr>
+                <td>{% trans "résultats" %}</td>
+                <td>{{object.calculatedpeptide_set.count}}</td>
+            </tr>
+            <tr>
+                <td>{% trans "status" %}</td>
+                <td>{{object.get_status_display}}</td>
+            </tr>
+            <tr>
+                <td>{% trans "mgf" %}</td>
+                <td>
+                    <div class="txt-box">
+                        {{object.mgf_part|linebreaks}}
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<table class="display" id="pep-datas">
+    <thead>
+        <th>{% trans "score" %}</th>
+        <th>{% trans "séquence" %}</th>
+        <th>{% trans "nb AA" %}</th>
+        <th>{% trans "mass total" %}</th>
+        <th>{% trans "% couverture" %}</th>
+        <th>{% trans "erreur total" %}</th>
+        <th>{% trans "erreur cumulée" %}</th>
+        <th>{% trans "intensitee total" %}</th>
+        <th>{% trans "intensitee total parent" %}</th>
+        <th>{% trans "% intensitee total" %}</th>
+    </thead>
+    <tfoot>
+        <th>{% trans "score" %}</th>
+        <th>{% trans "séquence" %}</th>
+        <th>{% trans "nb AA" %}</th>
+        <th>{% trans "mass total" %}</th>
+        <th>{% trans "% couverture" %}</th>
+        <th>{% trans "erreur total" %}</th>
+        <th>{% trans "erreur cumulée" %}</th>
+        <th>{% trans "intensitee total" %}</th>
+        <th>{% trans "intensitee total parent" %}</th>
+        <th>{% trans "% intensitee total" %}</th>
+    </tfoot>
+    <tbody>
+        {% for pep in object.calculatedpeptide_set.all %}
+        <tr value="{{forloop.counter0}}">
+            <td>{{pep.score}}</td>
+            <td>{% aa_sequence pep.sequence_AA %}</td>
+            <td>{{pep.nb_aa|floatformat:0}}</td>
+            <td>{{pep.mass_total}}</td>
+            <td>{{pep.percent_couverture|as_percentage_of:1}}</td>
+            <td>{{pep.error_total}}</td>
+            <td>{{pep.error_aa_cumul}}</td>
+            <td>{{pep.intensitee_total}}</td>
+            <td>{{pep.intensitee_total_parent}}</td>
+            <td>{{pep.percent_intensitee_utilisee|as_percentage_of:1}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    </thead>
+</table>
+
+<iframe src="{% url "analyse-detail-spectrum" object.analyse.pk %}" class="iviewer" id="frame-viewer"></iframe>
+
+{% endblock %}
+
+
+{% block app.scripts %}
+<link href="{{ STATIC_URL}}website/css/demo_table.css" rel="stylesheet" type="text/css" media="screen" />
+<link href="{{ STATIC_URL}}website/css/demo_table_jui.css" rel="stylesheet" type="text/css" media="screen" />
+<link href="{{ STATIC_URL}}website/css/jquery-ui-1.8.4.custom.css" rel="stylesheet" type="text/css" media="screen" />
+
+<script type="text/javascript" language="javascript" src="{{STATIC_URL}}website/js/jquery.dataTables.min.js"></script>
+<script>
+
+    $(document).ready(function() {
+        $('#pep-datas tr').click( function() {
+            $("#pep-datas tr").removeClass('row_selected');
+            $(this).toggleClass('row_selected');
+            i = $(this).attr("value");
+            viewer = document.getElementById("frame-viewer").contentWindow.viewer;
+            viewer.setMsMs(i);
+        });
+
+        oTable = $('#pep-datas').dataTable({
+            "sScrollY": 600,
+            "sScrollX": "100%",
+            "bJQueryUI": true,
+            "sPaginationType": "full_numbers",
+            "aLengthMenu": [[25, 50, 100, -1], [25, 50, 100, "All"]],
+            "iDisplayLength" : 25,
+            "aaSorting": [[ 0, "desc" ]],
+        });
+        $("#frame-viewer").load(function(){
+            var viewer = document.getElementById("frame-viewer").contentWindow.viewer;
+
+            setTimeout(function(){
+               viewer.overview.placeholder.unbind();//unbind MSviewer
+               viewer.setPeakByMass({{object.mass}}.toFixed(4));
+               viewer.setPeakByMass({{object.mass}}.toFixed(4));//Twice to fix display bug
+               viewer.plot();
+                {% if request.GET.cal %}
+                setTimeout(function(){
+                    viewer.setMsMsByPk({{request.GET.cal}});
+                },500);
+                {% endif %}
+           },1000);
+        });
+
+});
+</script>
+{% endblock %}

@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+{% load i18n markup gblocks %}
+{% block page.title %}{{page}}  {{ object}}{% endblock %}
+
+{% block page.body %}
+<h2>{{ object }}</h2>
+
+<div class="post">
+    <div class="entry">
+        <table>
+            <tr>
+                <td>{% trans "analyse" %}</td>
+                <td><a href="{{object.analyse.get_absolute_url}}">{{object.analyse}}</a>
+            </tr>
+            <tr>
+                <td>{% trans "Programme" %}</td>
+                <td>{{object.program}}</td>
+            </tr>
+            <tr>
+                <td>{% trans "Base de donnée" %}</td>
+                <td>{{object.database}}</td>
+            </tr>
+            <tr>
+                <td>{% trans "max séquence" %}</td>
+                <td>{{object.nb_seq_pep_pep}}</td>
+            </tr>
+            <tr>
+                <td>{% trans "min AA" %}</td>
+                <td>{{object.min_seq_size}}</td>
+            </tr>
+            <tr>
+                <td>{% trans "Fichier fasta source" %}</td>
+                <td>
+                    {% if object.fasta %}
+                    <a href="{{MEDIA_URL}}{{object.fasta}}" class="gblocks-file">
+                        <div class="icon {{object.fasta|get_file_extension}}">
+                            <span>{{object.fasta}}</span>
+                        </div>
+                    </a>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td>{% trans "Fichier de résultat" %}</td>
+                <td>
+                    {% if object.xml %}
+                    <a href="{{MEDIA_URL}}{{object.xml}}" class="gblocks-file">
+                        <div class="icon {{object.xml|get_file_extension}}">
+                            <span>{{object.xml}}</span>
+                        </div>
+                    </a>
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+    </div>
+    {% if object.can_blast %}
+    <span class="btn" id="go-blast">{% trans "Lancer" %}</span>
+    {% else %}
+    {% if object.get_status == "working" %}
+    <img src="{{STATIC_URL}}website/img/loading.gif">&nbsp;{% trans "Cela peut prendre un (long) moment. Rechargement toutes les 30 secondes" %}
+    {% endif %}
+    {% endif %}
+</div>
+{% if object.get_status = "ok" %}
+<table class="display" id="pep-datas">
+    <thead>
+        <tr>
+            <th>{% trans "Protéine" %}</th>
+            <th>{% trans "score moyen" %}</th>
+            <th>{% trans "score max" %}</th>
+            <th>{% trans "score min" %}</th>
+            <th>{% trans "nombre d'alignements"%}</th>
+            <th>{% trans "nombre de Peptide"%}</th>
+            <th>{% trans "nombre de sequences différentes" %}</th>
+            <th class="hidden">{% trans "ajax url" %}</th>
+        </tr>
+    </thead>
+    <tfoot>
+        <tr>
+            <th>{% trans "Protéine" %}</th>
+            <th>{% trans "score moyen" %}</th>
+            <th>{% trans "score max" %}</th>
+            <th>{% trans "score min" %}</th>
+            <th>{% trans "nombre d'alignements"%}</th>
+            <th>{% trans "nombre de Peptide"%}</th>
+            <th>{% trans "nombre de sequences différentes" %}</th>
+            <th class="hidden">{% trans "ajax url" %}</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+<div class="post" style="margin-top:20px;">
+    <h2>{% trans "Peptides identifiants"%}</h2>
+
+    <div class="entry" id="prot-datas">
+        <div class="header">
+            <div>prot :<span class="prot"></span></div>
+            <div>score moyen :<span class="score_avg"></span></div>
+            <div>score max: <span class="score_max"></span></div>
+            <div>score min: <span class="score_min"></span></div>
+            <div>nombre d'alignements: <span class="count_gi"></span></div>
+            <div>nombre de séquences : <span class="count_pep"></span></div>
+        </div>
+        <div id="pep-content">
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block app.scripts %}
+{% if object.can_blast %}
+<script>
+    $("#go-blast").click(function(){
+        $(this).replaceWith("<img src=\"{{STATIC_URL}}website/img/loading.gif\">&nbsp;{% trans "Cela peut prendre un (long) moment" %}");
+        $.ajax({
+            type:"POST",
+            url:"{{object.get_ajax_url}}?data=do-blast",
+            data:"",
+            success: function(json){
+                if(json.status == "ok"){
+                   location.reload();
+                }else{
+                    alert(json.message);
+                }
+            }
+        });
+     });
+</script>
+{% endif %}
+<script src="{{ STATIC_URL }}contentblocks/js/jquery.cookie.js"></script>
+<link href="{{ STATIC_URL}}website/css/demo_table.css" rel="stylesheet" type="text/css" media="screen" />
+<link href="{{ STATIC_URL}}website/css/demo_table_jui.css" rel="stylesheet" type="text/css" media="screen" />
+<link href="{{ STATIC_URL}}website/css/jquery-ui-1.8.4.custom.css" rel="stylesheet" type="text/css" media="screen" />
+<script type="text/javascript" language="javascript" src="{{STATIC_URL}}website/js/jquery.dataTables.js"></script>
+<script>
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if ($.cookie('csrftoken') && (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url)))) {
+                xhr.setRequestHeader("X-CSRFToken", $.cookie('csrftoken'))
+            }
+        }
+    });
+
+    $(document).ready(function() {
+
+
+        {% if object.get_status = "ok" %}
+        oTable = $('#pep-datas').dataTable({
+            "sScrollY": 600,
+            "sScrollX": "100%",
+            "bJQueryUI": true,
+            "sPaginationType": "full_numbers",
+            "aLengthMenu": [[25, 50, 100, 200,500, -1], [25, 50, 100, 200, 500, "All"]],
+            "iDisplayLength" : 25,
+            "aaSorting": [[5,"desc"],[6,"desc"],[1,"desc"]],
+
+            "bProcessing": true,
+            "bDeferRender": true,
+            "sAjaxSource": "{{object.get_ajax_url}}?data=table-list",
+            "sAjaxDataProp": "data.rows",
+            "aoColumns": [
+
+                { "mData": "name" ,"sWidth": "10%" ,"sClass" : "name"},
+                { "mData": "score_avg","sClass" : "score_avg"},
+                { "mData": "score_max", "sClass" : "score_max"},
+                { "mData": "score_min", "sClass" : "score_min"},
+                { "mData": "count_gi", "sClass": "count_gi"},
+                { "mData": "count_pep_parent", "sClass" : "count_pep_parent"},
+                { "mData": "count_pep", "sClass" : "count_pep"},
+                { "mData": "ajax-url", "sClass" : "ajax-url hidden"},
+            ],
+            "fnDrawCallback": function(oSettings) {
+                $("#pep-datas tbody tr:first").trigger('click');
+            }
+        });
+
+        $('#pep-datas tr').live("click",function() {
+            $("#pep-datas tr").removeClass('row_selected');
+            $(this).toggleClass('row_selected');
+            ajax_url = $(".ajax-url",$(this)).html();
+            that = $(this);
+            $.ajax({
+                type:"POST",
+                url: ajax_url+"?data=prot-list",
+                data:"",
+                success: function(json){
+                    if(json.status == "ok"){
+                        header = $(".header","#prot-datas");
+                        $(".prot",header).html($(".name",that).html());
+                        $(".score_avg",header).html($(".score_avg",that).html());
+                        $(".score_max",header).html($(".score_max",that).html());
+                        $(".score_min",header).html($(".score_min",that).html());
+                        $(".count_gi",header).html($(".count_gi",that).html());
+                        $(".count_pep",header).html($(".count_pep",that).html());
+                        prev_ana = null;
+                        prev_cal = null;
+                        html = "";
+                        for(i in json.data.rows){
+                            if(json.data.rows[i].ana_pk != prev_ana){
+                                if(prev_ana != null){
+                                    if(prev_cal != null){
+                                            html += "</div>";
+                                            prev_cal = null;
+                                    }
+                                    html += "</div>";
+                                }
+                                html += "<div class=\"ana\">"
+                                html += "<div class=\"header\">";
+                                html += "<span class=\"title\">"+json.data.rows[i].ana_name+"</span>";
+                                html += "<a class=\"url\" href=\""+json.data.rows[i].ana_url+"\">"+json.data.rows[i].ana_url+"</a>";
+                                html += "</div>";
+                            }
+                            if(json.data.rows[i].cal_pk != prev_cal){
+                                if(prev_cal != null){
+                                    html += "</div>";
+                                }
+                                html += "<div class=\"cal\">"
+                                html += "<div class=\"header\">";
+                                html += "<span class=\"title\">"+json.data.rows[i].sequence_aa+"</span>";
+                                html += "<a class=\"url\" href=\""+json.data.rows[i].cal_url+"\">"+json.data.rows[i].cal_url+"</a>";
+                                html += "</div>";
+                            }
+
+                            html += "<div class=\"alignement\">";
+                            html += "<table>";
+                            html += "<tr><td>score</td><td>"+json.data.rows[i].score+"</td></tr>";
+                            html += "<tr><td>e-value</td><td>"+json.data.rows[i].e_value+"</td></tr>";
+                            html += "<tr><td>real</td><td>"+json.data.rows[i].sequence_real+"</td></tr>";
+                            html += "<tr><td>match</td><td>"+json.data.rows[i].sequence_match+"</td></tr>";
+                            html += "</table>";
+                            html += "</div>";
+
+                            prev_ana = json.data.rows[i].ana_pk
+                            prev_cal = json.data.rows[i].cal_pk
+                        }
+                        if (prev_ana)
+                            html += "</div>";
+                        if (prev_cal)
+                            html += "</div>";
+                        $("#prot-datas #pep-content").html(html);
+                    }else{
+                        alert(json.message);
+                    }
+                }
+            });
+        });
+        {% endif %}
+
+        {% if object.get_status == "working" %}
+        setTimeout(function(){
+            location.reload();
+        },30000);
+        {% endif %}
+    });
+</script>
+{% endblock %}

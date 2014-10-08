@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block page.title %} | {% trans "Connexion" %}{% endblock %}
+
+{% block page.body %}
+<div class="post">
+    <h2 class="title">
+        {% trans "Entrez vos identifiants" %}
+    </h2>
+	<div class="entry">
+		{% if ERROR %}
+            <p class="error">{{ ERROR }}</p>
+		{% endif %}
+		<form method="post" action="/login/">
+			{% csrf_token %}
+			<table>
+				<tr>
+					<td><label>{% trans "Utilisateur" %}</label></td>
+					<td><input type="text" class="input" id="user" name="user"></td>
+				</tr>
+				<tr>
+					<td><label>{% trans "Mot de passe" %}</label></td>
+					<td><input type="password" class="input" id="pass" name="pass"></td>
+				</tr>
+				<tr>
+                    <td></td><td><input type="submit" class="submit" value="{% trans "Se connecter" %}"></td>
+                </tr>
+            </table>
+		</form>
+	</div>
+</div>
+<div class="post">
+    <h2 class="title">
+        {% trans "Vous n'avez pas de compte?" %}
+    </h2>
+    <h3>{% trans "Inscrivez vous dès maintenant!" %}</h3>
+    <div class="entry">
+		{% if form.errors %}
+		    {% for error in form.errors %}
+                {{ error }}
+            {% endfor %}
+		{% endif %}
+        <form method="post" action="/login/">
+            <table>
+            {% csrf_token %}
+            {% for field in FORM %}
+                {% if field.is_hidden %}
+                <div>{{ field }}</div>
+                {% else %}
+                    <tr>
+                        <td>{{ field.label_tag }}</td>
+                        <td {% if field.errors %}class="error_second"{% else %}class="input_second"{% endif %}> {{ field }}</td>
+                    </tr>
+                    {% if field.errors %}
+                    <tr><td colspan='2'>{{ field.errors }}</td></tr>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+            <tr><td></td><td><input class="submit" type="submit" value="{% trans "S'inscrire" %}"></td></tr>
+            </table>
+		</form>
+    </div>
+</div>
+{% endblock %}

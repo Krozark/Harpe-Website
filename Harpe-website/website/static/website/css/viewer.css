@@ -1,0 +1,131 @@
+@charset "UTF-8";
+/*
+SCSS3 (c) 2011 Motion Média
+Inspired by http://css3please.com/
+*/
+.clearfix, #viewer .tool-box, #viewer .wrapper {
+  zoom: 1; }
+  .clearfix:before, #viewer .tool-box:before, #viewer .wrapper:before, .clearfix:after, #viewer .tool-box:after, #viewer .wrapper:after {
+    content: '.';
+    display: block;
+    overflow: hidden;
+    visibility: hidden;
+    font-size: 0;
+    line-height: 0;
+    width: 0;
+    height: 0; }
+  .clearfix:after, #viewer .tool-box:after, #viewer .wrapper:after {
+    clear: both; }
+
+.reset-box {
+  margin: 0;
+  padding: 0; }
+
+#viewer {
+  width: 100%;
+  margin: 0 auto; }
+  #viewer .tool-box {
+    background-color: #A7CCC5;
+    width: 100%;
+    min-height: 60px;
+    height: auto;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    font-size: 0.9em; }
+    #viewer .tool-box .meta {
+      float: left;
+      width: auto;
+      padding: 5px; }
+      #viewer .tool-box .meta table th {
+        color: #006162; }
+      #viewer .tool-box .meta table td {
+        color: #000; }
+      #viewer .tool-box .meta table td, #viewer .tool-box .meta table th {
+        border: 1px solid black;
+        text-align: center;
+        padding: 2px; }
+    #viewer .tool-box .btns {
+      float: right;
+      margin: 5px;
+      margin-top: 15px; }
+      #viewer .tool-box .btns #centroid {
+        padding: 5px 14px;
+        margin: 10px 5px;
+        font-weight: bold;
+        color: #222;
+        background: #c84b4b;
+        border: 1px solid #dedede;
+        font-family: Tahoma, Geneva, sans-serif;
+        font-size: 13px;
+        width: 100px; }
+        #viewer .tool-box .btns #centroid.checked {
+          background: #68c864; }
+      #viewer .tool-box .btns .btn {
+        padding: 5px 14px;
+        margin: 10px 5px;
+        font-weight: bold;
+        color: #222;
+        background: #fcfcfc;
+        border: 1px solid #dedede;
+        font-family: Tahoma, Geneva, sans-serif;
+        font-size: 13px;
+        width: 100px; }
+        #viewer .tool-box .btns .btn:hover {
+          background: #ccc;
+          border: 1px solid #fff;
+          color: #fff; }
+  #viewer .wrapper {
+    width: 100%;
+    height: 600px; }
+    #viewer .wrapper .msms_list {
+      width: 20%;
+      height: 100%;
+      float: right;
+      overflow: auto; }
+      #viewer .wrapper .msms_list ul {
+        font-size: 0.6em;
+        list-style-type: none; }
+        #viewer .wrapper .msms_list ul li {
+          padding: 2px;
+          cursor: pointer; }
+          #viewer .wrapper .msms_list ul li.odd {
+            background-color: #A7CCC5; }
+          #viewer .wrapper .msms_list ul li.even {
+            background-color: #d1fff7; }
+          #viewer .wrapper .msms_list ul li.selected {
+            background-color: #FF8000; }
+    #viewer .wrapper .sequence {
+      position: absolute;
+      top: 0;
+      left: 0; }
+      #viewer .wrapper .sequence .peak {
+        position: absolute;
+        display: block;
+        background-color: #4ac42d;
+        width: 1px;
+        height: 0px; }
+      #viewer .wrapper .sequence .aa {
+        margin-top: 10px;
+        position: absolute;
+        display: block;
+        width: 20%; }
+    #viewer .wrapper .viewer_msms {
+      width: 80%;
+      height: 100%;
+      float: left; }
+  #viewer .viewer_overview {
+    width: 100%;
+    height: 150px;
+    padding-top: 20px; }
+  #viewer .viewer_current_peak {
+    position: absolute;
+    display: block;
+    background-color: #20b600;
+    width: 1px;
+    height: 0px; }
+  #viewer .viewer_indicator {
+    position: absolute;
+    display: block;
+    background-color: #ffbf00;
+    width: 1px;
+    height: 0px; }

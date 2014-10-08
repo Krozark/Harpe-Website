@@ -1,0 +1,91 @@
+<html>
+    <head>
+
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.4/jquery-ui.min.js"></script>
+
+        <!--[if IE]><script language="javascript" type="text/javascript" src="{{STATIC_URL}}website/Lorikeet/js/excanvas.min.js"></script><![endif]-->
+
+        <script type="text/javascript" src="{{ STATIC_URL}}website/Lorikeet/js/jquery.flot.js"></script>
+        <script type="text/javascript" src="{{ STATIC_URL}}website/Lorikeet/js/jquery.flot.selection.js"></script>
+        <script type="text/javascript" src="{{ STATIC_URL}}website/Lorikeet/js/specview.js"></script>
+        <script type="text/javascript" src="{{ STATIC_URL}}website/Lorikeet/js/peptide.js"></script>
+        <script type="text/javascript" src="{{ STATIC_URL}}website/Lorikeet/js/aminoacid.js"></script>
+        <script type="text/javascript" src="{{ STATIC_URL}}website/Lorikeet/js/ion.js"></script>
+        <link REL="stylesheet" TYPE="text/css" href="{{ STATIC_URL}}website/Lorikeet/css/lorikeet.css">
+
+
+    </head>
+
+    <body>
+        <div id="lorikeet"></div>
+
+        <script type="text/javascript">
+            $(document).ready(function() {
+
+
+                  var sequence = "SLEDLDKEMADYFEK";
+                  var scanNum = 36578;
+                  var filename = null;
+
+                  var charge = 2;
+                  var precursorMz = 917.849975586;
+
+                  var staticMods = [];
+                  var variableMods = []/*{index: 14, modMass: 16.0, aminoAcid: 'M'}*/;
+                  var ntermMod: 0; // additional mass to be added to the n-term
+                  var ctermMod: 0; // additional mass to be added to the c-term
+
+                  var peaks = [];
+                  var sparsePeaks: null;
+
+                  var ms1peaks = [{% for object in object.analysepeptide_set.all %}[{{object.mz|floatformat:4}},{{object.intensity}}]{% if not forloop.last%},{%endif%}{% endfor %}];
+                  var ms1scanLabel = "{{object}};
+
+                  var precursorPeaks = ms1peaks;   
+                  function precursorPeakClicked(precursorMz) {
+                      alert("precorsor peak clicked: "+precursorMz);
+                  };
+                  var zoomMs1 = "true";
+
+                  var width = 600;
+                  var height = 450;
+                  var massError: 0.05; // mass tolerance for labeling peaks
+                  var extraPeakSeries:[];
+                  var showIonTable: true;
+                  var showViewingOptions: true;
+                  var showOptionsTable: true;
+                  var showSequenceInfo: true;
+
+
+                  /* render the spectrum with the given options */
+                  $("#lorikeet").specview({
+                      "sequence":sequence,
+                      "scanNum":scanNum,
+                      "fileName":filename,
+                      "charge":charge,
+                      "precursorMz":precursorMz,
+                      "staticMods":staticMods, 
+                      "variableMods":variableMods,
+                      "ntermMod": ntermMod, // additional mass to be added to the n-term
+                      "ctermMod": ctermMod, // additional mass to be added to the c-term
+                      "peaks": peaks
+                      "sparsePeaks": sparsePeaks,
+                      "ms1peaks": ms1peaks,
+                      "ms1scanLabel":ms1scanLabel,
+                      "precursorPeaks": precursorPeaks,
+                      "precursorPeakClickFn": precursorPeakClicked,
+                      "zoomMs1": zoomMs1,
+                      "width": width, 	  // width of the ms/ms plot
+                      "height": height, 	  // height of the ms/ms plot
+                      "massError": massError, // mass tolerance for labeling peaks
+                      "extraPeakSeries": extraPeakSeries,
+                      "showIonTable": showIonTable,
+                      "showViewingOptions": showViewingOptions,
+                      "showOptionsTable": showOptionsTable,
+                      "showSequenceInfo": showSequenceInfo
+                  });
+            });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,43 @@
+<html>
+    <head>
+
+        <link href="{{ STATIC_URL}}website/css/reset.css" rel="stylesheet" type="text/css" media="screen" />
+        <link href="{{ STATIC_URL}}website/css/viewer.css" rel="stylesheet" type="text/css" media="screen" />
+
+        <script type="text/javascript" src="{{STATIC_URL}}website/js/jquery.js"></script>
+        <script type="text/javascript" src="{{STATIC_URL}}website/js/jquery-ui.min.js"></script>
+
+        <script type="text/javascript" src="{{ STATIC_URL}}website/js/jquery.flot.js"></script>
+        <script language="javascript" type="text/javascript" src="{{STATIC_URL}}/website/js/jquery.flot.crosshair.js"></script>
+        <script language="javascript" type="text/javascript" src="{{STATIC_URL}}website/js/jquery.flot.selection.js"></script>
+
+        <script language="javascript" type="text/javascript" src="{{STATIC_URL}}website/js/Viewer.js"></script>
+
+        <script src="{{ STATIC_URL }}contentblocks/js/jquery.cookie.js"></script>
+
+    </head>
+
+    <body>
+        <div id="viewer"></div>
+
+        <script type="text/javascript">
+            $.ajaxSetup({
+                beforeSend: function(xhr, settings) {
+                    if ($.cookie('csrftoken') && (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url)))) {
+                        xhr.setRequestHeader("X-CSRFToken", $.cookie('csrftoken'))
+                    }
+                }
+            });
+
+            var datas = [{% for object in object.analysepeptide_set.all %}[{{object.mz|floatformat:4}},{{object.intensity}}]{% if not forloop.last%},{%endif%}{% endfor %}];
+            
+            var viewer = new Viewer("#viewer","{{object.get_ajax_url}}");
+
+            $(document).ready(function() {
+                datas.sort(function(a,b){return a[0]-b[0];});
+                viewer.plot();
+            });
+            
+        </script>
+    </body>
+</html>

@@ -1,0 +1,132 @@
+{% load i18n Kraggne_tags contentblocks website_tags %}
+{% spaceless %}
+{% getmenu %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <title>Harpe&nbsp;|&nbsp;{% block page.title %}{{page.name}}{% endblock %}</title>
+        <meta name="keywords" content="" />
+
+        {% block site.headstyles %}
+        <link href="{{ STATIC_URL}}website/css/reset.css" rel="stylesheet" type="text/css" media="screen" />
+        <link href="{{STATIC_URL}}Kraggne/css/kraggne.css" rel="stylesheet">
+        <link href="{{ STATIC_URL}}website/css/site.css" rel="stylesheet" type="text/css" media="screen" />
+        {% block app.headstyles %}{% endblock %}
+        {% block project.headstyles %}{% endblock %}
+        {% endblock %}
+
+        {% block site.headscripts %}
+            <script src="{{STATIC_URL}}website/js/jquery.js"></script>
+            {% block app.headscripts %}{% endblock %}
+            {% block project.headscripts %}{% endblock %}
+        {% endblock %}
+
+        {% block hextraHead %} {% endblock %}
+        {% block document.favicon %}
+            <link rel="icon" type="image/png" href="{{STATIC_URL}}website/img/icon.jpg" />
+        {% endblock%}
+    </head>
+    <body>
+        <div class="header">
+            <div class="wrapper">
+                <div id="title">
+                    <a href="/"></a>
+                </div>
+                {% menu "main" %} 
+            </div>
+        </div>
+        <div id="main">
+            <div class="wrapper">
+                <div id="sidebar">
+                    {% sousmenu %}
+                    <h4>{% trans "États des serveurs de calcul" %}</h4>
+                    {% get_servers as "servers" %}
+                    <ul class="status">
+                        {% for server in servers %}
+                        <li class="active-{{server.is_active}}">{{server}}{% if server.is_active %}&nbsp;({{server.client_active.count}}){% endif %}</li>
+                        {% empty %}
+                        <li>{% trans "Aucun" %}
+                        {% endfor %}
+                    </ul>
+                    <h4>{% trans "Mes analyses récentes" %}</h4>
+                    <ul>
+                        {% with analyses=user|get_last_analyses %}
+                        {% for object in analyses %}
+                        <li><a href="{{object.get_absolute_url}}">{{object}}</a></li>
+                        {% empty %}
+                        <li>{% trans "Aucune" %}</li>
+                        {% endfor %}
+                        {% endwith %}
+                    </ul>
+                    {% block page.sidebar %}{% endblock %}
+                </div>
+                <div id="content">
+                    {% breadcrumb %}
+                    <div class="clearfix"></div>
+                    {% block page.body %}{% endblock %}
+                </div>
+
+            </div>
+        </div>
+        <div id="footer">
+            {% comment %}
+            <div class="wrapper">
+                <div class="col one_fourth">
+                    <h4>About Us</h4>
+                    <p>Lorem ipsum dolor sit amet, adipiscing consectetur adipiscing elit. Morbi eros scelerisque urna odio, rutrum quis volutpat nec, venenatis congue nulla. Praesent quis mauris purus, at pellentesque. Donec ut erat at urna condimentum mollis. Nulla feugiat feugiat erat et.</p>
+                </div>
+                <div class="col one_fourth">
+                    <h4>Blogroll</h4>
+                    <ul class="footer_list">
+                        <li><a href="#">Blah</a></li>
+                        <li><a href="#">Blah</a></li>
+                        <li><a href="#">Blah</a></li>
+                        <li><a href="#">Blah</a></li>
+                    </ul>   
+                </div>
+
+                <div class="col one_fourth">
+                    <h4>Twitter</h4>
+                    <ul class="twitter_post">
+                        <li>Suspendisse at scelerisque urna. Aenean tincidunt massa in tellus varius ultricies. <a href="#">http://bit.ly/13IwZO</a></li>
+                        <li>Proin dignissim, diam nec <a href="#">@Krozark</a> enim lorem tempus orci, ac imperdiet ante purus in justo.</li>   
+                    </ul>
+                </div>
+
+                <div class="col one_fourth no_margin_right">
+                    <h4>Follow Us</h4>	
+
+                    <div class="social_button">
+                        <div class="facebook" alt="Facebook" />
+                            <a href="#"></a>
+                        </div>
+                        <div class="flickr" alt="Flickr" />
+                            <a href="#"></a>
+                        </div>
+                        <div class="twitter" alt="twitter" />
+                            <a href="#"></a>
+                        </div>
+                        <div class="youtube" alt="youtube" />
+                            <a href="#"></a>
+                        </div>
+                        <div class="feed" alt="feed" />
+                            <a href="#"></a>
+                        </div>
+                    </div>
+
+                    <p class="copyright">
+                    Harpe &copy;&nbsp;&nbsp;2013 - {% now "Y" %}, {% trans "Conception" %} <a href="mailto:maxime.barbier1991@gmail.com">Maxime BARBIER</a>, {% trans "Tous droits réservés" %}.
+                    </p>
+                </div>
+            </div>
+            {% endcomment %}
+        </div>
+        {% block site.scripts %}
+        {% block app.scripts %}{% endblock %}
+        {% block project.scripts %}{% endblock %}
+        {% endblock %}
+    </body>
+</html>
+{% endspaceless %}
+

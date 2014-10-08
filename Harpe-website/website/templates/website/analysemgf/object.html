@@ -1,0 +1,21 @@
+{% load i18n markup website_tags %}
+
+<div class="post">
+    <div class="title">
+        <a href="{{ object.get_absolute_url }}"><h2>{{object}}</h2></a>
+        <span class="date right">{{object.created}}</span>
+    </div >
+    <div class="entry">
+        {{ object.descriptif|truncatewords_html:"70"|textile }}
+    </div>
+    <div class="meta">
+        <div class="byline">
+            {% with number=object.get_done number_ok=object.get_done_ok count=object.analysepeptide_set_count %}
+            {% trans "calculés" %}:&nbsp;{{number}}/{{count}} ({{number_ok|as_percentage_of:count}}%~{{ number|as_percentage_of:count }}%)
+            {% endwith %}
+        </div>
+        <div class="comments">
+            <a class="more" href="{{object.get_absolute_url}}">{% trans "Voir plus" %}</a>
+        </div>
+    </div>
+</div>

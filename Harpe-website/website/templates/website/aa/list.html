@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% load i18n contentblocks flatblocks %}
+
+{% block page.body %}
+<div class="post">
+    <div class="title">
+        {% trans "AA mass resolver (press enter)" %}
+    </div>
+    <div class="entry">
+        <input type="text" id="aa-sequence"><span id="aa-errors" class="error"></span>
+        masse:&nbsp;<span id="aa-mass">0</span>
+    </div>
+</div>
+
+<table id="aa-datas" class="data-table">
+    <thead>
+        <th>{% trans "Name" %}</th>
+        <th>{% trans "slug" %}</th>
+        <th>{% trans "code" %}</th>
+        <th>{% trans "formula" %}</th>
+        <th>{% trans "type" %}</th>
+        <th>{% trans "mass" %}</th>
+    </thead>
+    <tbody>
+    {% for object in object_list %}
+    <tr>
+        <td>{{object.name}}</td>
+        <td>{{object.slug}}</td>
+        <td>{{object.code}}</td>
+        <td>{{object.formule}}</td>
+        <td>{{object.type}}</td>
+        <td>{{object.mass}}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+{% block app.scripts %}
+<script src="{{ STATIC_URL }}contentblocks/js/jquery.cookie.js"></script>
+<link href="{{ STATIC_URL}}website/css/demo_table.css" rel="stylesheet" type="text/css" media="screen" />
+<link href="{{ STATIC_URL}}website/css/demo_table_jui.css" rel="stylesheet" type="text/css" media="screen" />
+<link href="{{ STATIC_URL}}website/css/jquery-ui-1.8.4.custom.css" rel="stylesheet" type="text/css" media="screen" />
+
+<script type="text/javascript" language="javascript" src="{{STATIC_URL}}website/js/jquery.dataTables.min.js"></script>
+<script>
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if ($.cookie('csrftoken') && (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url)))) {
+                xhr.setRequestHeader("X-CSRFToken", $.cookie('csrftoken'))
+            }
+        }
+    });
+
+    $(document).ready(function() {
+        oTable = $('#aa-datas').dataTable({
+            "sScrollY": 600,
+            "sScrollX": "100%",
+            "bJQueryUI": true,
+            "sPaginationType": "full_numbers",
+            "aLengthMenu": [[25,50,100,-1], [25,50,100,"All"]],
+            "iDisplayLength" : -1,
+            //"bSort" : false,
+            "aaSorting": [[ 0, "asc" ]],
+        });
+    } );
+
+
+    $("#aa-sequence").keyup(function (e) {
+        if (e.keyCode == 13) {
+            seq = $(this).val();
+            $.ajax({
+                type:"POST",
+                url:"{% url "ajax-aa" %}?data=mass&seq="+seq,
+                data:"",
+                success: function(json){
+                    if(json.status == "ok"){
+                        $("#aa-errors").html("");
+                        $("#aa-mass").html(json.data.mass);
+                    }else{
+                        $("#aa-errors").html(json.message);
+                        $("#aa-mass").html("error");
+                    }
+                }
+            });
+        }
+    });
+
+
+</script>
+
+{% endblock %}

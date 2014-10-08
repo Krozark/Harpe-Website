@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% load i18n contentblocks flatblocks %}
+
+{% block page.body %}
+
+<table id="aa-mod-datas" class="data-table">
+    <thead>
+        <th>{% trans "Name" %}</th>
+        <th>{% trans "slug" %}</th>
+        <th>{% trans "delta" %}</th>
+        <th>{% trans "AAs" %}</th>
+    </thead>
+    <tbody>
+    {% for object in object_list %}
+    <tr>
+        <td>{{object.name}}</td>
+        <td>{{object.slug}}</td>
+        <td>{{object.delta}}</td>
+        <td>{% for u in object.aamodificationposition_set.all%}
+            {{u.print_no_prefix}}
+            {% if not forloop.last %},{% endif %}
+            {%endfor%}
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+{% block app.scripts %}
+<link href="{{ STATIC_URL}}website/css/demo_table.css" rel="stylesheet" type="text/css" media="screen" />
+<link href="{{ STATIC_URL}}website/css/demo_table_jui.css" rel="stylesheet" type="text/css" media="screen" />
+<link href="{{ STATIC_URL}}website/css/jquery-ui-1.8.4.custom.css" rel="stylesheet" type="text/css" media="screen" />
+
+<script type="text/javascript" language="javascript" src="{{STATIC_URL}}website/js/jquery.dataTables.min.js"></script>
+<script>
+
+    $(document).ready(function() {
+        oTable = $('#aa-mod-datas').dataTable({
+            "sScrollY": 600,
+            "sScrollX": "100%",
+            "bJQueryUI": true,
+            "sPaginationType": "full_numbers",
+            "aLengthMenu": [[25,50,100,-1], [25,50,100,"All"]],
+            "iDisplayLength" : 25,
+            //"bSort" : false,
+            "aaSorting": [[ 0, "asc" ]],
+        });
+    } );
+</script>
+{% endblock %}

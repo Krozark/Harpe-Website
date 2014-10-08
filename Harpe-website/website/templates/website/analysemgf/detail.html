@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+{% load i18n markup gblocks flatblocks website_tags %}
+{% block page.title %}{{page}} {{ object}}{% endblock %}
+
+{% block page.body %}
+<h2>{{ object }}</h2>
+
+<div class="post">
+    <div class="entry">
+        <table>
+            <tr>
+                <td>{% trans "Descriptif"%}</td>
+                <td>{% if object.descriptif %}{{object.descriptif|textile}}{% else %}{% trans "Aucun" %}{% endif %}</td>
+            </tr>
+            <tr>
+                <td>{% trans "Enzyme utilisé" %}</td>
+                <td>{% if object.enzyme %}{{object.enzyme}}{% else %}{% trans "Non précisée" %}{% endif %}</td>
+            </tr>
+            <tr>
+                <td>{% trans "Max charge" %}</td>
+                <td>{{ object.get_max_charge_display }}</td>
+            </tr>
+            <tr>
+                <td>{% trans "Error delta" %}</td>
+                <td>{{ object.error }}</td>
+            </tr>
+            <tr>
+                <td>{% trans "AA non commun" %}</td>
+                <td>{% for aa in object.get_none_default_aa.all %}
+                    {{aa}}{% if not forloop.last %},{% endif %}
+                    {% empty %}
+                    {% trans "Aucun" %}
+                    {% endfor %}</td>
+            </tr>
+            <tr>
+                <td>{% trans "PTMs" %}</td>
+                <td>{% for mod in object.modifications.all %}
+                    <a href="{{mod.get_analyse_url}}">{{mod}}</a>{% if not forloop.last %},{% endif %}
+                    {% endfor %}</td>
+            </tr>
+            <tr>
+                <td>{% trans "Fichier original" %}</td>
+                <td>
+                    <a href="{{MEDIA_URL}}{{object.mgf}}">
+                        <div class="icon {{object.mgf|get_file_extension}}">
+                            {{object.mgf|get_file_name}}
+                        </div>
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td>{% trans "Date de création" %}</td>
+                <td><span class="date">{{object.created}}</span></td>
+            </tr>
+            <tr>
+                <td>{% trans "calculés" %}</td>
+                {% with number=object.get_done number_ok=object.get_done_ok count=object.analysepeptide_set.count %}
+                <td>{{number}}/{{count}} ({{number_ok|as_percentage_of:count}}%~{{ number|as_percentage_of:count }}%)</td>
+                {% endwith %}
+            </tr>
+        </table>
+    </div>
+    <div class="entry">
+    {% if object.can_analyse %}
+        <span class="btn" id="go-analyse">{% trans "Analyser" %}</span>
+    {% else %}
+        <span class="btn" id="go-blast">{% trans "Blast" %}</span>
+        {% if object.blastanalyse_set.count > 0 %}
+        <table style="margin-top: 10px;">
+            <tr>
+                <td>{% trans "Lien" %}</td>
+                <td>{% trans "Base de donnée" %}</td>
+                <td>{% trans "programme" %}</td>
+                <td>{% trans "max sequence" %}</td>
+                <td>{% trans "min AA" %}</td>
+                <td>{% trans "Status" %}</td>
+            </tr>
+            {% for blast in object.blastanalyse_set.all %}
+            <tr>
+                <td><a href="{{blast.get_absolute_url}}">{{blast.get_absolute_url}}</a></td>
+                <td>{{blast.database}}</td>
+                <td>{{blast.program}}</td>
+                <td>{{blast.nb_seq_pep_pep}}</td>
+                <td>{{blast.min_seq_size}}</td>
+                <td class="status"><img src="{{STATIC_URL}}website/img/status/{{blast.get_status}}.png"></td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+    {% endif %}
+    </div>
+</div>
+
+<table class="display" id="pep-datas">
+	<thead>
+        <tr>
+            <th>{% trans "name" %}</th>
+            <th>{% trans "sequence" %}</th>
+            <th>{% trans "score max" %}</th>
+            <th>{% trans "score min" %}</th>
+            <th>{% trans "masse" %}</th>
+            <th>{% trans "mz" %}</th>
+            <th>{% trans "int" %}</th>
+            <th>{% trans "z" %}</th>
+            <th>{% trans "res" %}</th>
+            <th>{% trans "status" %}</th>
+            <th class="hidden">{% trans "url" %}</th>
+            <th class="hidden">{% trans "status_nb" %}</th>
+        </tr>
+	</thead>
+	<tfoot>
+		<tr>
+            <th>{% trans "nom" %}</th>
+            <th>{% trans "sequence" %}</th>
+            <th>{% trans "score max" %}</th>
+            <th>{% trans "score min" %}</th>
+            <th>{% trans "mass" %}</th>
+            <th>{% trans "mz" %}</th>
+            <th>{% trans "int" %}</th>
+            <th>{% trans "z" %}</th>
+            <th>{% trans "res" %}</th>
+            <th>{% trans "status" %}</th>
+            <th class="hidden">{% trans "url" %}</th>
+            <th class="hidden">{% trans "status_nb" %}</th>
+        </tr>
+	</tfoot>
+    <tbody>
+    </tbody>
+</table>
+
+
+<a href="{% url "analyse-detail-spectrum" object.pk %}" target="blank">{% trans "Ouvrir dans une autre fenettre" %}</a>
+
+<iframe src="{% url "analyse-detail-spectrum" object.pk %}" class="iviewer" id="frame-viewer"></iframe>
+
+{% endblock %}
+
+{% block app.scripts %}
+{% if object.can_analyse %}
+<script src="{{ STATIC_URL }}contentblocks/js/jquery.cookie.js"></script>
+<script>
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if ($.cookie('csrftoken') && (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url)))) {
+                xhr.setRequestHeader("X-CSRFToken", $.cookie('csrftoken'))
+            }
+        }
+    });
+
+    $("#go-analyse").click(function(){
+        $.ajax({
+            type:"POST",
+            url:"{{object.get_analyse_url}}",
+            data:"",
+            success: function(json){
+                if(json.status == "ok"){
+                    location.reload();
+                }else{
+                    alert(json.message);
+                }
+            }
+        });
+    });
+</script>
+{% else %}
+<script>
+
+    $("#go-blast").click(function(){
+         {% if object.blastanalyse_set.count > 0 %}
+         if(confirm("Effectuer un nouveau blast?"))
+         {% endif %}
+         window.location.replace("{{object.get_blast_url}}");
+    });
+</script>
+{% endif %}
+
+<link href="{{ STATIC_URL}}website/css/demo_table.css" rel="stylesheet" type="text/css" media="screen" />
+<link href="{{ STATIC_URL}}website/css/demo_table_jui.css" rel="stylesheet" type="text/css" media="screen" />
+<link href="{{ STATIC_URL}}website/css/jquery-ui-1.8.4.custom.css" rel="stylesheet" type="text/css" media="screen" />
+<script type="text/javascript" language="javascript" src="{{STATIC_URL}}website/js/jquery.dataTables.js"></script>
+<script>
+    $(document).ready(function() {
+
+        oTable = $('#pep-datas').dataTable({
+            "sScrollY": 600,
+            "sScrollX": "100%",
+            "bJQueryUI": true,
+            "sPaginationType": "full_numbers",
+            "aLengthMenu": [[25, 50, 100, 200,500, -1], [25, 50, 100, 200, 500, "All"]],
+            "iDisplayLength" : 25,
+            "aaSorting": [[ 2, "desc" ]],
+
+            "bProcessing": true,
+            "bDeferRender": true,
+            "sAjaxSource": "{{object.get_ajax_url}}?data=table-list",
+            "sAjaxDataProp": "data.rows",
+            "aoColumns": [
+                { "mData": "name" ,"sWidth": "10%" },
+                { "mData": "sequence" ,"sWidth": "15%" , "sClass" : "sequence" },
+                { "mData": "score_max"},
+                { "mData": "score_min"},
+                { "mData": "mass", "sClass" : "mass"},
+                { "mData": "mz"},
+                { "mData": "intensity"},
+                { "mData": "charge"},
+                { "mData": "count"},
+                { "mData": "status"},
+                { "mData": "url","sClass": "url hidden"},
+                { "mData": "status_nb","sClass" : "status_nb hidden"/*,"bVisible": false,*/},
+            ],
+            "fnRowCallback": function(nRow, aData, iDisplayIndex ) {
+                status_nb = $('.status_nb',nRow).html();
+                $(nRow).addClass('status_'+status_nb);
+                row = $("td:eq(0)",nRow);
+                row.html("<a href=\""+$(".url",nRow).html()+"\">"+row.html()+"</a>");
+                return nRow;
+            }
+        });
+
+        $('#pep-datas tr').live("click",function() {
+            $("#pep-datas tr").removeClass('row_selected');
+            $(this).toggleClass('row_selected');
+            viewer = document.getElementById("frame-viewer").contentWindow.viewer;
+            mass = $(".mass",$(this)).html();
+            viewer.setPeakByMass(mass);
+            viewer.plot();
+        });
+    });
+</script>
+{% endblock %}

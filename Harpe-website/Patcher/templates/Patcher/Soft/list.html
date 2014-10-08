@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load markup %}
+
+{% block page.title %} Softs {% endblock %}
+
+{% block page.body %}
+{% for object in object_list %}
+<div class="patcher-soft">
+    <h3><a href="{{object.get_absolute_url}}">{{object.name}}</a></h3>
+
+    {{object.description|textile}}
+
+    <a href="{{object.get_absolute_url}}">Voir les versions ({{object.version_set.count}})</a>
+</div>
+{% endfor %}
+{% endblock %}

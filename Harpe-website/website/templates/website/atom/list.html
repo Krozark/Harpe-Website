@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% load i18n contentblocks flatblocks %}
+
+{% block page.body %}
+
+<div class="btn" id="show-isotops">{% trans "Show/hide isotopes" %}</div>
+
+<table id="atom-datas">
+    <thead>
+        <th>{% trans "Name" %}</th>
+        <th>{% trans "slug" %}</th>
+        <th>{% trans "Num" %}</th>
+        <th>{% trans "Mass" %}</th>
+        <th>{% trans "Freq" %}</th>
+    </thead>
+    <tfoot>
+        <th>{% trans "Name" %}</th>
+        <th>{% trans "slug" %}</th>
+        <th>{% trans "Num" %}</th>
+        <th>{% trans "Mass" %}</th>
+        <th>{% trans "Freq" %}</th>
+    </tfoot>
+    <tbody>
+    {% for object in object_list %}
+    {% for isotop in object.atomisotope_set.all %}
+    <tr class="atom-{%if forloop.first %}first{%else%}other{%endif%}" atom="{{object.id}}">
+        <td>{{object.name}}</td>
+        <td>{{object.slug}}</td>
+        <td>{{object.per_id}}</td>
+        <td>{{isotop.mass}}</td>
+        <td>{{isotop.frequence}}</td>
+    </tr>
+    {% endfor %}
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+{% block app.scripts %}
+<link href="{{ STATIC_URL}}website/css/demo_table.css" rel="stylesheet" type="text/css" media="screen" />
+<link href="{{ STATIC_URL}}website/css/demo_table_jui.css" rel="stylesheet" type="text/css" media="screen" />
+<link href="{{ STATIC_URL}}website/css/jquery-ui-1.8.4.custom.css" rel="stylesheet" type="text/css" media="screen" />
+
+<script type="text/javascript" language="javascript" src="{{STATIC_URL}}website/js/jquery.dataTables.min.js"></script>
+<script>
+
+    $(document).ready(function() {
+        $('.atom-first').click( function() {
+            console.log($(this).attr("atom"));
+            $(".atom-other[atom=\""+$(this).attr("atom")+"\"]").toggleClass('hidden');
+        });
+
+        $("#show-isotops").click(function(){
+            $('.atom-other').toggleClass("hidden");
+        });
+
+        oTable = $('#atom-datas').dataTable({
+            "sScrollY": 600,
+            "sScrollX": "100%",
+            "bJQueryUI": true,
+            "sPaginationType": "full_numbers",
+            "aLengthMenu": [[-1], ["All"]],
+            "iDisplayLength" : -1,
+            "bSort" : false,
+            "aaSorting": [/*[ 2, "asc" ]*/],
+        });
+    } );
+</script>
+
+{% endblock %}

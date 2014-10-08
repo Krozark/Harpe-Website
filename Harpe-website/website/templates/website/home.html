@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load i18n flatblocks contentblocks %}
+
+{% block page.title %}Accueil{% endblock %}
+
+{% block page.body %}
+
+<h2>MAJ</h2>
+<div class="post">
+    <div class="entry">
+        <ul>
+            <li>Ajout d'un "AA mass resolver" dans la section Acide Aminé</li>
+            <li>Ajouts des Blasts. Un certain nombre de parmètres sont à rentrer. Attention, les blasts prennent beaucoup de temps</li>
+            <li>Ajout d'une section AA et Atoms. Leurs masses y sont inscrites</li>
+        </ul>
+    </div>
+</div>
+
+
+{% comment %}
+<h1>h1 Blah</h1>
+<h2>h2 Blah</h2>
+<h3>h3 blah</h3>
+
+<p>Lorem ipsum dolor sit amet, adipiscing consectetur adipiscing elit. Morbi eros scelerisque urna odio, rutrum quis volutpat nec, venenatis congue nulla. Praesent quis mauris purus, at pellentesque. Donec ut erat at urna condimentum mollis. Nulla feugiat feugiat erat et.</p>
+
+<div class="pagination">
+    <ul>
+        <li><a href="#" target="_parent">Previous</a></li>
+        <li><a href="#" target="_parent">1</a></li>
+        <li><a href="#" target="_parent">2</a></li>
+        <li><a href="#" target="_parent">3</a></li>
+        <li><a href="#" target="_parent">4</a></li>
+        <li><a href="#" target="_parent">5</a></li>
+        <li><a href="#" target="_parent">6</a></li>
+        <li><a href="" target="_parent">Next</a></li>
+    </ul>
+</div>
+
+<form method="post" name="contact" action="#">
+
+    <label for="author">Name:</label>
+    <ul class="errorlist">
+        <li>Ce champ est obligatoire.</li>
+    </ul>
+    <input type="text" id="author" name="author" />
+
+
+    <label for="email">Email:</label>
+    <input type="text" id="email" name="email" />
+
+    <label for="subject">Subject:</label>
+    <input type="text" name="subject" id="subject" />
+
+    <label for="text">Message:</label>
+    <textarea id="text" name="text" rows="0" cols="0"></textarea>
+
+    <input type="submit" value="Send" id="submit" name="submit" class="btn left" />
+    <input type="reset" value="Reset" id="reset" name="reset" class="btn right" />
+
+</form>
+
+{% endcomment %}
+
+{% endblock %}
