@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 
 #from django.conf import settings
-from django.conf.urls.defaults import patterns, include, url
+#for django 1.5
+#~ from django.conf.urls.defaults import patterns, include, url
+# django 1.6
+from django.conf.urls import patterns, include, url
 
 from Patcher.views import SoftListAllView, VersionListView
 

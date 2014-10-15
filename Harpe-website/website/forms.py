@@ -32,7 +32,8 @@ class AnalyseMgfForm(forms.ModelForm):
         return object
 
 class CreatUserForm(UserCreationForm):
-    email = forms.EmailField(_('mail'))
+    #~ _('mail') was in EmailField django 1.5
+    email = forms.EmailField(label = _('mail'))
 
     class Meta:
         model = User

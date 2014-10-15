@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 import Kraggne.views as _view
 #import GenericView, GenericFormView, GenericDetailView, GenericListView
-from django.conf.urls.defaults import patterns,url
+#~old import for django 1.5 
+#~ from django.conf.urls.defaults import patterns,url
+#~ new import for django 1.6 
+from django.conf.urls import patterns,url
 from django.utils.translation import ugettext_lazy as _
 from django.db.models.loading import get_model
 from django.contrib.auth.decorators import login_required

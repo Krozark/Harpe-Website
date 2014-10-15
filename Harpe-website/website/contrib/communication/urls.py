@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from django.conf.urls.defaults import *
+#~ In django 1.5 
+#~ from django.conf.urls.defaults import *
+#~ for django 1.6
+from django.conf.urls import *
 #from django.conf import settings
 from website.contrib.communication.views import *
 

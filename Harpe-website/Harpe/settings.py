@@ -136,7 +136,8 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'django.contrib.humanize',
-    'django.contrib.markup',
+    #~ depreciated in 1.6 
+    #~ 'django.contrib.markup',
 
     'website',
     'website.contrib.communication',

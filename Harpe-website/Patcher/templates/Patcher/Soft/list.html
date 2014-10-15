@@ -1,5 +1,8 @@
 {% extends "base.html" %}
+
+{% comment "with markup /!\ don't exist anymore" %}
 {% load markup %}
+{% endcomment %}
 
 {% block page.title %} Softs {% endblock %}
 
@@ -7,8 +10,12 @@
 {% for object in object_list %}
 <div class="patcher-soft">
     <h3><a href="{{object.get_absolute_url}}">{{object.name}}</a></h3>
-
+    
+    {% comment "with markup /!\ don't exist anymore" %}
     {{object.description|textile}}
+    {% endcomment %}
+    
+    {{object.description}}
 
     <a href="{{object.get_absolute_url}}">Voir les versions ({{object.version_set.count}})</a>
 </div>
