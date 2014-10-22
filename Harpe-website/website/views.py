@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 
 from django.http import HttpResponseRedirect, HttpResponse
@@ -225,12 +226,28 @@ class Ajax_AnalyseMgfDetailView(JSONAjaxView):
         for u in obj.analysepeptide_set.select_related("calculatedpeptide_set").all():
             count = u.calculatedpeptide_set.count()
             row = {}
+            
             row["name"] = u.name
-            row["sequence"] = u.sequence_aa #asSequence(aas,mods,u.sequence)
-            row["score_max"] = u.score_max
-            row["score_min"] = u.score_min
-            row["mass"] = "%.4f" % u.mass
-            row["mz"] = "%.4f" % u.mz
+            if u.sequence_aa != "":
+                row["sequence"] = u.sequence_aa #asSequence(aas,mods,u.sequence)
+            else:
+                row["sequence"] = "None"
+            if u.score_max != "":
+                row["score_max"] = u.score_max
+            else:
+                row["score_max"] = "-1"
+            if u.score_min != "":
+                row["score_min"] = u.score_min
+            else:
+                row["score_min"] = "-1"
+            if u.mass != "":
+                row["mass"] = "%.4f" % u.mass
+            else:
+                row["mass"] = "None"
+            if u.mz != "":
+                row["mz"] = "%.4f" % u.mz
+            else:
+                row["mz"] = "None"
             row["intensity"] = u.intensity
             row["charge"] = u.charge
             row["count"] = count
@@ -245,6 +262,7 @@ class Ajax_AnalyseMgfDetailView(JSONAjaxView):
 
         for u in obj.analysepeptide_set.select_related("calculatedpeptide_set").all():
             row = {}
+            
             row["name"] = u.name
             row["mass"] = "%.4f" % u.mass
             row["mz"] = "%.4f" % u.mz
